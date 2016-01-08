@@ -1,0 +1,20 @@
+{
+  "name": "vhtec/php-xrandr",
+  "description": "Xrandr class for PHP.",
+  "license": "MIT",
+  "version": "master",
+  "type": "library",
+  "homepage": "https://github.com/LordOfTheRats/php_xrandr",
+  "authors": [
+    {
+      "name": "René Vögeli",
+      "email": "rvoegeli@vhtec.de"
+    }
+  ],
+  "autoload": {
+    "psr-4": {
+      "Xrandr\\": "src/Xrandr"
+    }
+  },
+  "require": {}
+}
