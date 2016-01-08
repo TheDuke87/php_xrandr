@@ -1,0 +1,7 @@
+<#if licenseFirst??>
+/**
+</#if>
+
+<#if licenseLast??>
+*/
+</#if>
