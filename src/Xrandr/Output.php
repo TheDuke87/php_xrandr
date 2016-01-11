@@ -296,7 +296,7 @@ class Output {
     trim($line);
 
     if (preg_match(Output::LINE_REGEX, $line, $result)) {
-      return new Output($result["name"], ($result["connected"] == "connected") ? true : false, (isset($result["primary"]) && $result["primary"] == "primary") ? true : false, isset($result["geometry"]) ? Geometry::parseString($result["geometry"]) : NULL, isset($result["rotation"]) ? $result["rotation"] : "", isset($result["reflection"]) ? Reflection::parseString($result["reflection"]) : "", isset($result["physicalWidth"]) ? $result["physicalWidth"] : 0, isset($result["physicalHeight"]) ? $result["physicalHeight"] : 0);
+      return new Output($result["name"], ($result["connected"] == "connected") ? true : false, (isset($result["primary"]) && $result["primary"] == "primary") ? true : false, isset($result["geometry"]) ? Geometry::parseString($result["geometry"]) : NULL, (isset($result["rotation"]) && $result["rotation"] != "") ? $result["rotation"] : NULL, isset($result["reflection"]) ? Reflection::parseString($result["reflection"]) : "", isset($result["physicalWidth"]) ? $result["physicalWidth"] : 0, isset($result["physicalHeight"]) ? $result["physicalHeight"] : 0);
     }
 
     // ToDo: Exeption handling
