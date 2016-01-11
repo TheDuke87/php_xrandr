@@ -183,6 +183,20 @@ class Xrandr {
   }
 
   /**
+   * Get list of connected, non-primary output names
+   * @return array
+   */
+  public function getConnectedSecondaryOutputNames() {
+    $outputs = $this->getConnectedSecondaryOutputs();
+
+    if ($outputs == NULL) {
+      return NULL;
+    }
+
+    return array_keys($outputs);
+  }
+
+  /**
    * Get list of connected, active outputs, keyed by name
    * @return array
    */
@@ -201,6 +215,52 @@ class Xrandr {
   }
 
   /**
+   * Get list of active output names
+   * @return array
+   */
+  public function getActiveOutputNames() {
+    $outputs = $this->getActiveOutputs();
+
+    if ($outputs == NULL) {
+      return NULL;
+    }
+
+    return array_keys($outputs);
+  }
+
+  /**
+   * Get list of connected, active, non-primary outputs, keyed by name
+   * @return array
+   */
+  public function getActiveSecondaryOutputs() {
+    $outputs = $this->getActiveOutputs();
+
+    if ($outputs == NULL) {
+      return NULL;
+    }
+
+    return array_filter(
+            $outputs, function ($e) {
+      return $e->isPrimary() == false;
+    }
+    );
+  }
+
+  /**
+   * Get list of connected output names
+   * @return array
+   */
+  public function getActiveSecondaryOutputNames() {
+    $outputs = $this->getActiveSecondaryOutputNames();
+
+    if ($outputs == NULL) {
+      return NULL;
+    }
+
+    return array_keys($outputs);
+  }
+
+  /**
    * Get list of disconnected outputs, keyed by name
    * @return array
    */
@@ -216,6 +276,20 @@ class Xrandr {
       return $e->isConnected() == false;
     }
     );
+  }
+
+  /**
+   * Get list of disconnected output names
+   * @return array
+   */
+  public function getDisconnectedOutputNames() {
+    $outputs = $this->getDisconnectedOutputs();
+
+    if ($outputs == NULL) {
+      return NULL;
+    }
+
+    return array_keys($outputs);
   }
 
   /**
