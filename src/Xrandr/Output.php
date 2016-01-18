@@ -379,7 +379,7 @@ class Output {
    * @return boolean
    */
   public function setPosition($position, $otherOutput) {
-    return $this->_executeCommand("--{$position} {$otherOutput}");
+    return $this->_executeCommand("--{$position} {$otherOutput->getName()}");
   }
 
   /**
