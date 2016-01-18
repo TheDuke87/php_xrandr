@@ -399,4 +399,40 @@ class Output {
     return $this->_executeCommand("--scale " . $resolution->getResolutionString());
   }
 
+  /**
+   * Set output scale-from
+   * @param \Geometry $resolution Resolution to be scaled to
+   * @return boolean
+   */
+  public function setScaleFrom($resolution) {
+    return $this->_executeCommand("--scale-from " . $resolution->getResolutionString());
+  }
+
+  /**
+   * Set output scale-from output
+   * @param \Output $output Active output the resolution is to be scaled to
+   * @return boolean
+   */
+  public function setScaleFromOutput($output) {
+    if (!$output->isActive()) {
+      return false;
+    }
+
+    return $this->_executeCommand("--scale-from " . $output->getGeometry()->getResolutionString());
+  }
+
+  /**
+   * Reset scale-from to current mode's resolution
+   * @return boolean
+   */
+  public function resetScaleFrom() {
+    $nativeGeometry = $this->getCurrentMode()->getProbableGeometry();
+
+    if ($nativeGeometry == null) {
+      return false;
+    }
+
+    return $this->_executeCommand("--scale-from " . $nativeGeometry->getResolutionString());
+  }
+
 }
