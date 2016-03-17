@@ -363,6 +363,7 @@ class Xrandr {
     $this->screens = array();
     $this->outputs = array();
     $currentOutput = NULL;
+    $outputIndex = 0;
 
     $raw = $this->getRaw();
     if ($raw == NULL) {
@@ -379,7 +380,7 @@ class Xrandr {
           break;
         // Output
         case preg_match(Output::LINE_REGEX, $line, $result):
-          $currentOutput = Output::parseLine($line);
+          $currentOutput = Output::parseLine($outputIndex++, $line);
           $this->outputs[$currentOutput->getName()] = $currentOutput;
           break;
         // Mode

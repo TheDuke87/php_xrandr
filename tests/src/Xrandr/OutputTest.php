@@ -36,99 +36,99 @@ use \Xrandr\Reflection;
  */
 class OutputTest extends PHPUnit_Framework_TestCase {
 
-	/**
-	 * Sets up the fixture, for example, opens a network connection.
-	 * This method is called before a test is executed.
-	 */
-	protected function setUp() {
+  /**
+   * Sets up the fixture, for example, opens a network connection.
+   * This method is called before a test is executed.
+   */
+  protected function setUp() {
 
-	}
+  }
 
-	/**
-	 * Tears down the fixture, for example, closes a network connection.
-	 * This method is called after a test is executed.
-	 */
-	protected function tearDown() {
+  /**
+   * Tears down the fixture, for example, closes a network connection.
+   * This method is called after a test is executed.
+   */
+  protected function tearDown() {
 
-	}
+  }
 
-	/**
-	 * @covers \Xrandr\Output::parseLine
-	 * @covers \Xrandr\Output::isConnected
-	 * @covers \Xrandr\Output::isPrimary
-	 * @covers \Xrandr\Output::getGeometry
-	 * @covers \Xrandr\Output::getRotation
-	 * @covers \Xrandr\Output::getPhysicalWidth
-	 * @covers \Xrandr\Output::getPhysicalHeight
-	 * @covers \Xrandr\Output::__construct
-	 * @afterClass \Xrandr\Geometry
-	 */
-	public function testParseLine() {
-		$object = Output::parseLine("eDP1 connected primary 1360x768+0+0 (normal left inverted right x axis y axis) 344mm x 193mm");
-		$this->assertEquals("eDP1", $object->getName());
-		$this->assertTrue($object->isConnected());
-		$this->assertTrue($object->isPrimary());
-		$this->assertNotNull($object->getGeometry());
-		$this->assertEquals(1360, $object->getGeometry()->width);
-		$this->assertEquals(768, $object->getGeometry()->height);
-		$this->assertEquals(344, $object->getPhysicalWidth());
-		$this->assertEquals(193, $object->getPhysicalHeight());
+  /**
+   * @covers \Xrandr\Output::parseLine
+   * @covers \Xrandr\Output::isConnected
+   * @covers \Xrandr\Output::isPrimary
+   * @covers \Xrandr\Output::getGeometry
+   * @covers \Xrandr\Output::getRotation
+   * @covers \Xrandr\Output::getPhysicalWidth
+   * @covers \Xrandr\Output::getPhysicalHeight
+   * @covers \Xrandr\Output::__construct
+   * @afterClass \Xrandr\Geometry
+   */
+  public function testParseLine() {
+    $object = Output::parseLine(0, "eDP1 connected primary 1360x768+0+0 (normal left inverted right x axis y axis) 344mm x 193mm");
+    $this->assertEquals("eDP1", $object->getName());
+    $this->assertTrue($object->isConnected());
+    $this->assertTrue($object->isPrimary());
+    $this->assertNotNull($object->getGeometry());
+    $this->assertEquals(1360, $object->getGeometry()->width);
+    $this->assertEquals(768, $object->getGeometry()->height);
+    $this->assertEquals(344, $object->getPhysicalWidth());
+    $this->assertEquals(193, $object->getPhysicalHeight());
 
-		$object = Output::parseLine("eDP1 connected primary 1360x768+0+0 left (normal left inverted right x axis y axis) 344mm x 193mm");
-		$this->assertEquals("eDP1", $object->getName());
-		$this->assertEquals("left", $object->getRotation());
+    $object = Output::parseLine(1, "eDP1 connected primary 1360x768+0+0 left (normal left inverted right x axis y axis) 344mm x 193mm");
+    $this->assertEquals("eDP1", $object->getName());
+    $this->assertEquals("left", $object->getRotation());
 
-		$object = Output::parseLine("eDP1 connected primary 1360x768+0+0 X axis (normal left inverted right x axis y axis) 344mm x 193mm");
-		$this->assertEquals("eDP1", $object->getName());
-		$this->assertEquals(Reflection::X, $object->getReflection());
+    $object = Output::parseLine(2, "eDP1 connected primary 1360x768+0+0 X axis (normal left inverted right x axis y axis) 344mm x 193mm");
+    $this->assertEquals("eDP1", $object->getName());
+    $this->assertEquals(Reflection::X, $object->getReflection());
 
-		$object = Output::parseLine("eDP1 connected primary 1360x768+0+0 right X and Y axis (normal left inverted right x axis y axis) 344mm x 193mm");
-		$this->assertEquals("eDP1", $object->getName());
-		$this->assertEquals("right", $object->getRotation());
-		$this->assertEquals(Reflection::XY, $object->getReflection());
+    $object = Output::parseLine(3, "eDP1 connected primary 1360x768+0+0 right X and Y axis (normal left inverted right x axis y axis) 344mm x 193mm");
+    $this->assertEquals("eDP1", $object->getName());
+    $this->assertEquals("right", $object->getRotation());
+    $this->assertEquals(Reflection::XY, $object->getReflection());
 
-		$object = Output::parseLine("DP1 disconnected (normal left inverted right x axis y axis)");
-		$this->assertEquals("DP1", $object->getName());
-		$this->assertFalse($object->isConnected());
-		$this->assertFalse($object->isPrimary());
-		$this->assertNull($object->getGeometry());
-		$this->assertEquals(0, $object->getPhysicalWidth());
-		$this->assertEquals(0, $object->getPhysicalHeight());
+    $object = Output::parseLine(4, "DP1 disconnected (normal left inverted right x axis y axis)");
+    $this->assertEquals("DP1", $object->getName());
+    $this->assertFalse($object->isConnected());
+    $this->assertFalse($object->isPrimary());
+    $this->assertNull($object->getGeometry());
+    $this->assertEquals(0, $object->getPhysicalWidth());
+    $this->assertEquals(0, $object->getPhysicalHeight());
 
-		$object = Output::parseLine("DP1 partying hard (normal left inverted right x axis y axis)");
-		$this->assertNull($object);
-	}
+    $object = Output::parseLine(5, "DP1 partying hard (normal left inverted right x axis y axis)");
+    $this->assertNull($object);
+  }
 
-	/**
-	 * @covers \Xrandr\Output::parseLine
-	 * @covers \Xrandr\Output::__construct
-	 * @covers \Xrandr\Output::_addExistingMode
-	 * @covers \Xrandr\Output::getCurrentMode
-	 * @afterClass \Xrandr\Mode
-	 */
-	public function testGetCurrentMode() {
-		$object = Output::parseLine("eDP1 connected primary 1360x768+0+0 (normal left inverted right x axis y axis) 344mm x 193mm");
-		$object->_addExistingMode(Mode::parseLine("   1366x768       60.0 +"));
-		$object->_addExistingMode(Mode::parseLine("   1360x768       59.8*    60.0"));
-		$object->_addExistingMode(Mode::parseLine("   1024x768       60.0 "));
+  /**
+   * @covers \Xrandr\Output::parseLine
+   * @covers \Xrandr\Output::__construct
+   * @covers \Xrandr\Output::_addExistingMode
+   * @covers \Xrandr\Output::getCurrentMode
+   * @afterClass \Xrandr\Mode
+   */
+  public function testGetCurrentMode() {
+    $object = Output::parseLine(6, "eDP1 connected primary 1360x768+0+0 (normal left inverted right x axis y axis) 344mm x 193mm");
+    $object->_addExistingMode(Mode::parseLine("   1366x768       60.0 +"));
+    $object->_addExistingMode(Mode::parseLine("   1360x768       59.8*    60.0"));
+    $object->_addExistingMode(Mode::parseLine("   1024x768       60.0 "));
 
-		$this->assertEquals("1360x768", $object->getCurrentMode()->getName());
-	}
+    $this->assertEquals("1360x768", $object->getCurrentMode()->getName());
+  }
 
-	/**
-	 * @covers \Xrandr\Output::parseLine
-	 * @covers \Xrandr\Output::__construct
-	 * @covers \Xrandr\Output::_addExistingMode
-	 * @covers \Xrandr\Output::getPreferredMode
-	 * @afterClass \Xrandr\Mode
-	 */
-	public function testGetPreferredMode() {
-		$object = Output::parseLine("eDP1 connected primary 1360x768+0+0 (normal left inverted right x axis y axis) 344mm x 193mm");
-		$object->_addExistingMode(Mode::parseLine("   1366x768       60.0 +"));
-		$object->_addExistingMode(Mode::parseLine("   1360x768       59.8*    60.0"));
-		$object->_addExistingMode(Mode::parseLine("   1024x768       60.0 "));
+  /**
+   * @covers \Xrandr\Output::parseLine
+   * @covers \Xrandr\Output::__construct
+   * @covers \Xrandr\Output::_addExistingMode
+   * @covers \Xrandr\Output::getPreferredMode
+   * @afterClass \Xrandr\Mode
+   */
+  public function testGetPreferredMode() {
+    $object = Output::parseLine(7, "eDP1 connected primary 1360x768+0+0 (normal left inverted right x axis y axis) 344mm x 193mm");
+    $object->_addExistingMode(Mode::parseLine("   1366x768       60.0 +"));
+    $object->_addExistingMode(Mode::parseLine("   1360x768       59.8*    60.0"));
+    $object->_addExistingMode(Mode::parseLine("   1024x768       60.0 "));
 
-		$this->assertEquals("1366x768", $object->getPreferredMode()->getName());
-	}
+    $this->assertEquals("1366x768", $object->getPreferredMode()->getName());
+  }
 
 }

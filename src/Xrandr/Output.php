@@ -55,6 +55,12 @@ class Output {
 
   /**
    *
+   * @var int $index Index of the output in alphabetical order
+   */
+  private $index;
+
+  /**
+   *
    * @var string $name Name of the output
    */
   private $name;
@@ -108,7 +114,7 @@ class Output {
   private $modes;
 
   /**
-   *
+   * @param int $index Index of output
    * @param string $name Name of output
    * @param boolean $connected Is currently connected
    * @param boolean $primary Is primary output
@@ -118,7 +124,8 @@ class Output {
    * @param int $physicalWidth Output physical width
    * @param int $physicalHeight Output physical height
    */
-  public function __construct($name, $connected, $primary = false, $geometry = NULL, $rotation = "", $reflection = "", $physicalWidth = 0, $physicalHeight = 0) {
+  public function __construct($index, $name, $connected, $primary = false, $geometry = NULL, $rotation = "", $reflection = "", $physicalWidth = 0, $physicalHeight = 0) {
+    $this->index = $index;
     $this->name = $name;
     $this->connected = $connected;
     $this->primary = $primary;
@@ -127,6 +134,14 @@ class Output {
     $this->reflection = $reflection;
     $this->physicalWidth = $physicalWidth;
     $this->physicalHeight = $physicalHeight;
+  }
+
+  /**
+   * Get the output index
+   * @return int
+   */
+  public function getIndex() {
+    return $this->index;
   }
 
   /**
@@ -288,15 +303,16 @@ class Output {
 
   /**
    * Parse a line (from xrandr's output) containing an output
+   * @param int $index Index
    * @param string $line Line to be parsed
    * @return \Output
    * @todo Exception handling
    */
-  public static function parseLine($line) {
+  public static function parseLine($index, $line) {
     trim($line);
 
     if (preg_match(Output::LINE_REGEX, $line, $result)) {
-      return new Output($result["name"], ($result["connected"] == "connected") ? true : false, (isset($result["primary"]) && $result["primary"] == "primary") ? true : false, isset($result["geometry"]) ? Geometry::parseString($result["geometry"]) : NULL, (isset($result["rotation"]) && $result["rotation"] != "") ? $result["rotation"] : Rotation::NORMAL, isset($result["reflection"]) ? Reflection::parseString($result["reflection"]) : Reflection::NORMAL, isset($result["physicalWidth"]) ? $result["physicalWidth"] : 0, isset($result["physicalHeight"]) ? $result["physicalHeight"] : 0);
+      return new Output($index, $result["name"], ($result["connected"] == "connected") ? true : false, (isset($result["primary"]) && $result["primary"] == "primary") ? true : false, isset($result["geometry"]) ? Geometry::parseString($result["geometry"]) : NULL, (isset($result["rotation"]) && $result["rotation"] != "") ? $result["rotation"] : Rotation::NORMAL, isset($result["reflection"]) ? Reflection::parseString($result["reflection"]) : Reflection::NORMAL, isset($result["physicalWidth"]) ? $result["physicalWidth"] : 0, isset($result["physicalHeight"]) ? $result["physicalHeight"] : 0);
     }
 
     // ToDo: Exeption handling
