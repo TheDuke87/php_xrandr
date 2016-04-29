@@ -24,18 +24,18 @@ THE SOFTWARE.
 -->
 
 <phpdoc>
-	<title>PHP Xrandr</title>
-	<parser>
-		<target>doc</target>
-		<default-package-name>PHP_Xrandr</default-package-name>
-	</parser>
-	<transformer>
-		<target>doc</target>
-	</transformer>
-	<transformations>
-		<template name="clean" />
-	</transformations>
-	<files>
-		<directory>src/</directory>
-	</files>
+  <title>PHP Xrandr</title>
+  <parser>
+    <target>doc</target>
+    <default-package-name>PHP_Xrandr</default-package-name>
+  </parser>
+  <transformer>
+    <target>doc</target>
+  </transformer>
+  <transformations>
+    <template name="clean"/>
+  </transformations>
+  <files>
+    <directory>src/</directory>
+  </files>
 </phpdoc>
