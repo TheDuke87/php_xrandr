@@ -26,12 +26,6 @@
 
 namespace Xrandr;
 
-require_once dirname(__FILE__) . '/Geometry.php';
-require_once dirname(__FILE__) . '/Mode.php';
-require_once dirname(__FILE__) . '/Position.php';
-require_once dirname(__FILE__) . '/Reflection.php';
-require_once dirname(__FILE__) . '/Rotation.php';
-
 /**
  * Represents an output (monitor connector)
  *

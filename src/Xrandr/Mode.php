@@ -26,8 +26,6 @@
 
 namespace Xrandr;
 
-require_once dirname(__FILE__) . '/Geometry.php';
-
 /**
  * Represents a modeline attached to an output
  *

@@ -26,10 +26,6 @@
 
 namespace Xrandr;
 
-require_once dirname(__FILE__) . '/Screen.php';
-require_once dirname(__FILE__) . '/Output.php';
-require_once dirname(__FILE__) . '/Mode.php';
-
 /**
  * Represents the xrandr utility
  *

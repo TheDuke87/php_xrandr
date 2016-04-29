@@ -23,8 +23,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-require_once dirname(__FILE__) . '/../../../src/Xrandr/Geometry.php';
-require_once dirname(__FILE__) . '/../../../src/Xrandr/Mode.php';
+require_once dirname(__FILE__) . '/../../../vendor/autoload.php';
 
 use \Xrandr\Mode;
 use \Xrandr\Geometry;
