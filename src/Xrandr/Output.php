@@ -77,7 +77,7 @@ class Output
 
   /**
    *
-   * @var \Geometry $geometry Output geometry
+   * @var Geometry $geometry Output geometry
    */
   private $geometry;
 
@@ -112,15 +112,15 @@ class Output
   private $modes;
 
   /**
-   * @param int       $index          Index of output
-   * @param string    $name           Name of output
-   * @param boolean   $connected      Is currently connected
-   * @param boolean   $primary        Is primary output
-   * @param \Geometry $geometry       Output geometry
-   * @param string    $rotation       Output rotation
-   * @param string    $reflection     Output reflection
-   * @param int       $physicalWidth  Output physical width
-   * @param int       $physicalHeight Output physical height
+   * @param int      $index          Index of output
+   * @param string   $name           Name of output
+   * @param boolean  $connected      Is currently connected
+   * @param boolean  $primary        Is primary output
+   * @param Geometry $geometry       Output geometry
+   * @param string   $rotation       Output rotation
+   * @param string   $reflection     Output reflection
+   * @param int      $physicalWidth  Output physical width
+   * @param int      $physicalHeight Output physical height
    */
   public function __construct($index, $name, $connected, $primary = false, $geometry = null, $rotation = "",
     $reflection = "", $physicalWidth = 0, $physicalHeight = 0)
@@ -142,7 +142,7 @@ class Output
    * @param int    $index Index
    * @param string $line  Line to be parsed
    *
-   * @return \Output
+   * @return Output
    * @todo Exception handling
    */
   public static function parseLine($index, $line)
@@ -175,16 +175,6 @@ class Output
   public function getIndex()
   {
     return $this->index;
-  }
-
-  /**
-   * Get the output name
-   *
-   * @return string
-   */
-  public function getName()
-  {
-    return $this->name;
   }
 
   /**
@@ -233,62 +223,6 @@ class Output
     }
 
     return true;
-  }
-
-  /**
-   * Is the output active
-   *
-   * @return boolean
-   */
-  public function isActive()
-  {
-    return ($this->getCurrentMode() != null);
-  }
-
-  /**
-   * Get the currently active mode
-   *
-   * @return \Mode
-   */
-  public function getCurrentMode()
-  {
-    $modes = $this->getModes();
-
-    if ($modes == null) {
-      return null;
-    }
-
-    $result = array_values(array_filter(
-      $modes, function ($e) {
-      return $e->isCurrent() == true;
-    }
-    ));
-
-    if (count($result) > 0) {
-      return $result[0];
-    }
-
-    return null;
-  }
-
-  /**
-   * Get list of modes attached to the output
-   *
-   * @return array
-   */
-  public function getModes()
-  {
-    return $this->modes;
-  }
-
-  /**
-   * Get the output geometry
-   *
-   * @return \Geometry
-   */
-  public function getGeometry()
-  {
-    return $this->geometry;
   }
 
   /**
@@ -358,7 +292,7 @@ class Output
   /**
    * Add an existing Mode to the output (used by parser)
    *
-   * @param \Mode $mode
+   * @param Mode $mode
    */
   public function _addExistingMode($mode)
   {
@@ -390,9 +324,19 @@ class Output
   }
 
   /**
+   * Get list of modes attached to the output
+   *
+   * @return array
+   */
+  public function getModes()
+  {
+    return $this->modes;
+  }
+
+  /**
    * Get the preferred mode
    *
-   * @return \Mode
+   * @return Mode
    */
   public function getPreferredMode()
   {
@@ -448,7 +392,7 @@ class Output
   /**
    * Set the output mode
    *
-   * @param \Mode $mode Mode to be switched to
+   * @param Mode $mode Mode to be switched to
    *
    * @return boolean
    */
@@ -460,8 +404,8 @@ class Output
   /**
    * Set output position relative to another output
    *
-   * @param string  $position    Position to be set (use Position enum)
-   * @param \Output $otherOutput Other output to position relative to
+   * @param string $position    Position to be set (use Position enum)
+   * @param Output $otherOutput Other output to position relative to
    *
    * @return boolean
    */
@@ -471,9 +415,19 @@ class Output
   }
 
   /**
+   * Get the output name
+   *
+   * @return string
+   */
+  public function getName()
+  {
+    return $this->name;
+  }
+
+  /**
    * Set output scale
    *
-   * @param \Geometry $resolution Resolution to be scaled to
+   * @param Geometry $resolution Resolution to be scaled to
    *
    * @return boolean
    */
@@ -485,7 +439,7 @@ class Output
   /**
    * Set output scale-from
    *
-   * @param \Geometry $resolution Resolution to be scaled to
+   * @param Geometry $resolution Resolution to be scaled to
    *
    * @return boolean
    */
@@ -497,7 +451,7 @@ class Output
   /**
    * Set output scale-from output
    *
-   * @param \Output $output Active output the resolution is to be scaled to
+   * @param Output $output Active output the resolution is to be scaled to
    *
    * @return boolean
    */
@@ -508,6 +462,52 @@ class Output
     }
 
     return $this->_executeCommand("--scale-from " . $output->getGeometry()->getResolutionString());
+  }
+
+  /**
+   * Is the output active
+   *
+   * @return boolean
+   */
+  public function isActive()
+  {
+    return ($this->getCurrentMode() != null);
+  }
+
+  /**
+   * Get the currently active mode
+   *
+   * @return Mode
+   */
+  public function getCurrentMode()
+  {
+    $modes = $this->getModes();
+
+    if ($modes == null) {
+      return null;
+    }
+
+    $result = array_values(array_filter(
+      $modes, function ($e) {
+      return $e->isCurrent() == true;
+    }
+    ));
+
+    if (count($result) > 0) {
+      return $result[0];
+    }
+
+    return null;
+  }
+
+  /**
+   * Get the output geometry
+   *
+   * @return Geometry
+   */
+  public function getGeometry()
+  {
+    return $this->geometry;
   }
 
   /**

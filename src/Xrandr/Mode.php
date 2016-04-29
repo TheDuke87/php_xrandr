@@ -89,7 +89,7 @@ class Mode
    *
    * @param string $line Line to be parsed
    *
-   * @return \Mode
+   * @return Mode
    */
   public static function parseLine($line)
   {
@@ -151,7 +151,7 @@ class Mode
   /**
    * Parse the name as geometry string and return resulting Geometry
    *
-   * @return \Geometry
+   * @return Geometry
    */
   public function getProbableResolution()
   {

@@ -48,17 +48,17 @@ class Screen
   private $id;
 
   /**
-   * @var \Geometry $minimumGeometry Minimum geometry of the screen
+   * @var Geometry $minimumGeometry Minimum geometry of the screen
    */
   private $minimumGeometry;
 
   /**
-   * @var \Geometry $currentGeometry Current geometry of the screen
+   * @var Geometry $currentGeometry Current geometry of the screen
    */
   private $currentGeometry;
 
   /**
-   * @var \Geometry $maximumGeometry Maximum geometry of the screen
+   * @var Geometry $maximumGeometry Maximum geometry of the screen
    */
   private $maximumGeometry;
 
@@ -82,7 +82,7 @@ class Screen
    *
    * @param string $line Line to be parsed
    *
-   * @return \Screen
+   * @return Screen
    */
   public static function parseLine($line)
   {
@@ -114,7 +114,7 @@ class Screen
   /**
    * Get the minimum geometry of the screen
    *
-   * @return \Geometry
+   * @return Geometry
    */
   public function getMinimumGeometry()
   {
@@ -124,7 +124,7 @@ class Screen
   /**
    * Get the current geometry of the screen
    *
-   * @return \Geometry
+   * @return Geometry
    */
   public function getCurrentGeometry()
   {
@@ -134,7 +134,7 @@ class Screen
   /**
    * Get the maximum geometry of the screen
    *
-   * @return \Geometry
+   * @return Geometry
    */
   public function getMaximumGeometry()
   {

@@ -55,7 +55,7 @@ class Xrandr
   /**
    * Parsed raw xrandr output and builds lists for screens and outputs
    *
-   * @throws Exception
+   * @throws \Exception
    */
   public function parseRaw()
   {
@@ -85,7 +85,7 @@ class Xrandr
         // Mode
         case preg_match(Mode::LINE_REGEX, $line, $result):
           if (!isset($currentOutput)) {
-            throw new Exception("parseRawException: Mode line but no currentOutput\n$line");
+            throw new \Exception("parseRawException: Mode line but no currentOutput\n$line");
           }
           $currentOutput->_addExistingMode(Mode::parseLine($line));
           break;
@@ -188,7 +188,7 @@ class Xrandr
   /**
    * Get primary output
    *
-   * @return \Output
+   * @return Output
    */
   public function getPrimaryOutput()
   {
@@ -394,7 +394,7 @@ class Xrandr
   /**
    * Get output with coordinates 0+0
    *
-   * @return \Output
+   * @return Output
    */
   public function getOutputAtZeroPoint()
   {

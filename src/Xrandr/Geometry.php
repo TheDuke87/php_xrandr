@@ -80,7 +80,7 @@ class Geometry
    *
    * @param string $string String to be parsed
    *
-   * @return \Geometry
+   * @return Geometry
    */
   public static function parseString($string)
   {
