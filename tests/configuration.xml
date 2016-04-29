@@ -32,4 +32,4 @@ THE SOFTWARE.
 				 stopOnFailure="true">
 </phpunit-->
 
-<phpunit colors="true" />
+<phpunit colors="true"/>

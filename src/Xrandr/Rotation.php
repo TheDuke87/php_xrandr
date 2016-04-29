@@ -31,11 +31,12 @@ namespace Xrandr;
  *
  * @author René Vögeli <rvoegeli@vhtec.de>
  */
-abstract class Rotation {
+abstract class Rotation
+{
 
-	const NORMAL = "normal";
-	const LEFT = "left";
-	const RIGHT = "right";
-	const INVERTED = "inverted";
+  const NORMAL = "normal";
+  const LEFT = "left";
+  const RIGHT = "right";
+  const INVERTED = "inverted";
 
 }

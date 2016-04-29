@@ -31,99 +31,114 @@ namespace Xrandr;
  *
  * @author René Vögeli <rvoegeli@vhtec.de>
  */
-class Screen {
+class Screen
+{
 
-	/**
-	 * Screen <id>: minimum <minimumGeometry>, current <currentGeometry>, maximum <maximumGeometry>
-	 * Screen 0: minimum 8 x 8, current 1360 x 768, maximum 32767 x 32767
-	 *
-	 * Named Subpatterns: http://php.net/manual/en/function.preg-match.php Example #4
-	 */
-	const LINE_REGEX = '/^Screen (?P<id>\d+): minimum (?P<minimumGeometry>\d+\s?x\s?\d+), current (?P<currentGeometry>\d+\s?x\s?\d+), maximum (?P<maximumGeometry>\d+\s?x\s?\d+)$/';
+  /**
+   * Screen <id>: minimum <minimumGeometry>, current <currentGeometry>, maximum <maximumGeometry>
+   * Screen 0: minimum 8 x 8, current 1360 x 768, maximum 32767 x 32767
+   *
+   * Named Subpatterns: http://php.net/manual/en/function.preg-match.php Example #4
+   */
+  const LINE_REGEX = '/^Screen (?P<id>\d+): minimum (?P<minimumGeometry>\d+\s?x\s?\d+), current (?P<currentGeometry>\d+\s?x\s?\d+), maximum (?P<maximumGeometry>\d+\s?x\s?\d+)$/';
 
-	/**
-	 * @var int $id Id of the screen
-	 */
-	private $id;
+  /**
+   * @var int $id Id of the screen
+   */
+  private $id;
 
-	/**
-	 * @var \Geometry $minimumGeometry Minimum geometry of the screen
-	 */
-	private $minimumGeometry;
+  /**
+   * @var \Geometry $minimumGeometry Minimum geometry of the screen
+   */
+  private $minimumGeometry;
 
-	/**
-	 * @var \Geometry $currentGeometry Current geometry of the screen
-	 */
-	private $currentGeometry;
+  /**
+   * @var \Geometry $currentGeometry Current geometry of the screen
+   */
+  private $currentGeometry;
 
-	/**
-	 * @var \Geometry $maximumGeometry Maximum geometry of the screen
-	 */
-	private $maximumGeometry;
+  /**
+   * @var \Geometry $maximumGeometry Maximum geometry of the screen
+   */
+  private $maximumGeometry;
 
-	/**
-	 *
-	 * @param int $id Id of the screen
-	 * @param Geometry $minimumGeometry Minimum geometry of the screen
-	 * @param Geometry $currentGeometry Current geometry of the screen
-	 * @param Geometry $maximumGeometry Maximum geometry of the screen
-	 */
-	public function __construct($id, $minimumGeometry, $currentGeometry, $maximumGeometry) {
-		$this->id = $id;
-		$this->minimumGeometry = $minimumGeometry;
-		$this->currentGeometry = $currentGeometry;
-		$this->maximumGeometry = $maximumGeometry;
-	}
+  /**
+   *
+   * @param int      $id              Id of the screen
+   * @param Geometry $minimumGeometry Minimum geometry of the screen
+   * @param Geometry $currentGeometry Current geometry of the screen
+   * @param Geometry $maximumGeometry Maximum geometry of the screen
+   */
+  public function __construct($id, $minimumGeometry, $currentGeometry, $maximumGeometry)
+  {
+    $this->id = $id;
+    $this->minimumGeometry = $minimumGeometry;
+    $this->currentGeometry = $currentGeometry;
+    $this->maximumGeometry = $maximumGeometry;
+  }
 
-	/**
-	 * Get the id of the screen
-	 * @return int
-	 */
-	public function getId() {
-		return $this->id;
-	}
+  /**
+   * Parse a line (from xrandr's output) containing a screen
+   *
+   * @param string $line Line to be parsed
+   *
+   * @return \Screen
+   */
+  public static function parseLine($line)
+  {
+    trim($line);
 
-	/**
-	 * Get the minimum geometry of the screen
-	 * @return \Geometry
-	 */
-	public function getMinimumGeometry() {
-		return $this->minimumGeometry;
-	}
+    if (preg_match(Screen::LINE_REGEX, $line, $result)) {
+      return new Screen($result["id"], Geometry::parseString($result["minimumGeometry"]),
+        Geometry::parseString($result["currentGeometry"]), Geometry::parseString($result["maximumGeometry"]));
+    }
 
-	/**
-	 * Get the current geometry of the screen
-	 * @return \Geometry
-	 */
-	public function getCurrentGeometry() {
-		return $this->currentGeometry;
-	}
+    // ToDo: Exeption handling
+    if (Xrandr::DEBUG) {
+      echo "Screen line could not be parsed!\n";
+    }
 
-	/**
-	 * Get the maximum geometry of the screen
-	 * @return \Geometry
-	 */
-	public function getMaximumGeometry() {
-		return $this->maximumGeometry;
-	}
+    return null;
+  }
 
-	/**
-	 * Parse a line (from xrandr's output) containing a screen
-	 * @param string $line Line to be parsed
-	 * @return \Screen
-	 */
-	public static function parseLine($line) {
-		trim($line);
+  /**
+   * Get the id of the screen
+   *
+   * @return int
+   */
+  public function getId()
+  {
+    return $this->id;
+  }
 
-		if (preg_match(Screen::LINE_REGEX, $line, $result)) {
-			return new Screen($result["id"], Geometry::parseString($result["minimumGeometry"]), Geometry::parseString($result["currentGeometry"]), Geometry::parseString($result["maximumGeometry"]));
-		}
+  /**
+   * Get the minimum geometry of the screen
+   *
+   * @return \Geometry
+   */
+  public function getMinimumGeometry()
+  {
+    return $this->minimumGeometry;
+  }
 
-		// ToDo: Exeption handling
-		if (Xrandr::DEBUG) {
-			echo "Screen line could not be parsed!\n";
-		}
-		return NULL;
-	}
+  /**
+   * Get the current geometry of the screen
+   *
+   * @return \Geometry
+   */
+  public function getCurrentGeometry()
+  {
+    return $this->currentGeometry;
+  }
+
+  /**
+   * Get the maximum geometry of the screen
+   *
+   * @return \Geometry
+   */
+  public function getMaximumGeometry()
+  {
+    return $this->maximumGeometry;
+  }
 
 }
