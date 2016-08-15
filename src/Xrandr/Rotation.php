@@ -34,9 +34,9 @@ namespace Xrandr;
 abstract class Rotation
 {
 
-  const NORMAL = "normal";
-  const LEFT = "left";
-  const RIGHT = "right";
-  const INVERTED = "inverted";
+    const NORMAL = "normal";
+    const LEFT = "left";
+    const RIGHT = "right";
+    const INVERTED = "inverted";
 
 }
