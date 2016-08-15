@@ -34,44 +34,44 @@ namespace Xrandr;
 abstract class Reflection
 {
 
-  const NORMAL = "normal";
-  const X = "x";
-  const Y = "y";
-  const XY = "xy";
+    const NORMAL = "normal";
+    const X = "x";
+    const Y = "y";
+    const XY = "xy";
 
-  /**
-   * Parse a string containing the current reflection of an output
-   * and converts it to a more usable format
-   *
-   * Named Subpatterns: http://php.net/manual/en/function.preg-match.php Example #4
-   *
-   * @param string $string String to be parsed
-   *
-   * @return string
-   */
-  public static function parseString($string)
-  {
-    // Using switch just because I think its more "logical" selecting from a case
-    switch (true) {
-      case ($string == ""):
-        return null;
-      // X and Y axis
-      case preg_match('/X and Y axis/', $string, $result):
-        return Reflection::XY;
-      // X axis
-      case preg_match('/X axis/', $string, $result):
-        return Reflection::X;
-      // Y axis
-      case preg_match('/Y axis/', $string, $result):
-        return Reflection::Y;
-      default:
-        // ToDo: Exeption handling
-        if (Xrandr::DEBUG) {
-          echo "Reflection string could not be parsed!\n";
+    /**
+     * Parse a string containing the current reflection of an output
+     * and converts it to a more usable format
+     *
+     * Named Subpatterns: http://php.net/manual/en/function.preg-match.php Example #4
+     *
+     * @param string $string String to be parsed
+     *
+     * @return string
+     */
+    public static function parseString($string)
+    {
+        // Using switch just because I think its more "logical" selecting from a case
+        switch (true) {
+            case ($string == ""):
+                return null;
+            // X and Y axis
+            case preg_match('/X and Y axis/', $string, $result):
+                return Reflection::XY;
+            // X axis
+            case preg_match('/X axis/', $string, $result):
+                return Reflection::X;
+            // Y axis
+            case preg_match('/Y axis/', $string, $result):
+                return Reflection::Y;
+            default:
+                // ToDo: Exeption handling
+                if (Xrandr::DEBUG) {
+                    echo "Reflection string could not be parsed!\n";
+                }
+
+                return null;
         }
-
-        return null;
     }
-  }
 
 }

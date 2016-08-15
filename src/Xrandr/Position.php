@@ -34,10 +34,10 @@ namespace Xrandr;
 abstract class Position
 {
 
-  const LEFT = "left-of";
-  const RIGHT = "right-of";
-  const SAME = "same-as";
-  const ABOVE = "above";
-  const BELOW = "below";
+    const LEFT = "left-of";
+    const RIGHT = "right-of";
+    const SAME = "same-as";
+    const ABOVE = "above";
+    const BELOW = "below";
 
 }
