@@ -36,7 +36,8 @@ class Output
 
     /**
      * <name> <dis/connected> <primary> <resolution> <rotation> <reflection> (normal left inverted right x axis y axis)
-     * <physicalWidth>mm x <physicalHeight>mm eDP1 connected primary 1360x768+0+0 (normal left inverted right x axis y
+     * <physicalWidth>mm x <physicalHeight>mm
+     * eDP1 connected primary 1360x768+0+0 (normal left inverted right x axis y
      * axis) 344mm x 193mm DVI-I-1 connected primary 1360x768+0+0 (normal left inverted right x axis y axis) 344mm x
      * 193mm DP1 disconnected (normal left inverted right x axis y axis) VGA1 connected primary 1920x1200+0+0 ROTATION
      * REFLECTION ([AVAILABLE ROTATIONS] [AVAILABLE REFLECTIONS]) 519mm x 324mm panning %dx%d+%d+%d tracking %dx%d+%d+%d
@@ -49,7 +50,7 @@ class Output
      * @todo Regex is incomplete since some features are not needed, yet. Complete line is available above, extracted
      *       from xrandr.c
      */
-    const LINE_REGEX = '/^(?P<name>[\w-]+) (?P<connected>(dis)?connected)\s?(?P<primary>primary)?\s?(?P<geometry>[x+\-\d]+)?\s?(?P<rotation>(left|right|inverted))?\s?(?P<reflection>X?\s?(and)?\s?Y? axis)?\s?(\(normal left inverted right x axis y axis\))?\s?((?P<physicalWidth>\d+)mm x (?P<physicalHeight>\d+)mm)?$/';
+    const LINE_REGEX = '/^(?P<name>[\w-]+) (?P<connected>(dis)?connected)\s?(?P<primary>primary)?\s?(?P<geometry>[x+\-\d]+)?\s?(?P<rotation>(normal|left|right|inverted))?\s?(?P<reflection>X?\s?(and)?\s?Y? axis)?\s?(\(normal left inverted right x axis y axis\))?\s?((?P<physicalWidth>\d+)mm x (?P<physicalHeight>\d+)mm)?$/';
 
     /**
      *
