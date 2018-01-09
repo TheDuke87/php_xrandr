@@ -193,7 +193,7 @@ class Xrandr
      */
     public function getPrimaryOutput()
     {
-        $outputs = $this->getOutputs();
+        $outputs = $this->getConnectedOutputs();
 
         if ($outputs == null) {
             return null;
