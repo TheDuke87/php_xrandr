@@ -35,9 +35,9 @@ class Xrandr
 {
 
     const CVT_BIN = "cvt";
-    const XRANDR_BIN = "xrandr";
     const DEBUG = false;
-
+    const TIMEOUT_BIN = "timeout";
+    const XRANDR_BIN = "xrandr";
     private $raw;
     private $outputs;
     private $screens;
@@ -124,7 +124,7 @@ class Xrandr
      */
     private function refreshRaw()
     {
-        exec(Xrandr::XRANDR_BIN . " --query", $output, $exitcode);
+        exec(Xrandr::TIMEOUT_BIN . ' --signal=KILL 10s ' . Xrandr::XRANDR_BIN . " --query", $output, $exitcode);
 
         if ($exitcode != 0) {
             return false;
@@ -213,22 +213,6 @@ class Xrandr
     }
 
     /**
-     * Get list of connected output names
-     *
-     * @return array
-     */
-    public function getConnectedOutputNames()
-    {
-        $outputs = $this->getConnectedOutputs();
-
-        if ($outputs == null) {
-            return null;
-        }
-
-        return array_keys($outputs);
-    }
-
-    /**
      * Get list of connected outputs, keyed by name
      *
      * @return array
@@ -246,6 +230,22 @@ class Xrandr
             return $e->isConnected() == true;
         }
         );
+    }
+
+    /**
+     * Get list of connected output names
+     *
+     * @return array
+     */
+    public function getConnectedOutputNames()
+    {
+        $outputs = $this->getConnectedOutputs();
+
+        if ($outputs == null) {
+            return null;
+        }
+
+        return array_keys($outputs);
     }
 
     /**
