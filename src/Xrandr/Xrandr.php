@@ -450,7 +450,7 @@ class Xrandr
      * @param Geometry $geometry
      * @param int      $frequency
      *
-     * @return Mode|bool
+     * @return Mode|string|bool
      */
     public function newMode($geometry, $frequency = null)
     {
@@ -467,7 +467,7 @@ class Xrandr
         $outputArray = explode(' ', $output[1], 3);
         exec(Xrandr::XRANDR_BIN . " --newmode {$outputArray[1]} {$outputArray[2]}", $output, $exitcode);
         if ($exitcode != 0) {
-            return false;
+            return $outputArray[1];
         }
 
         $newMode = new Mode($outputArray[1], $frequency);
