@@ -51,66 +51,56 @@ class Output
      *       from xrandr.c
      */
     const LINE_REGEX = '/^(?P<name>[\w-]+) (?P<connected>(dis)?connected)\s?(?P<primary>primary)?\s?(?P<geometry>[x+\-\d]+)?\s?(?P<rotation>(normal|left|right|inverted))?\s?(?P<reflection>X?\s?(and)?\s?Y? axis)?\s?(\(normal left inverted right x axis y axis\))?\s?((?P<physicalWidth>\d+)mm x (?P<physicalHeight>\d+)mm)?$/';
-
-    /**
-     *
-     * @var int $index Index of the output in alphabetical order
-     */
-    private $index;
-
-    /**
-     *
-     * @var string $name Name of the output
-     */
-    private $name;
-
     /**
      *
      * @var boolean $connected Is connected
      */
     private $connected;
-
-    /**
-     *
-     * @var boolean $primary Is primary
-     */
-    private $primary;
-
     /**
      *
      * @var Geometry $geometry Output geometry
      */
     private $geometry;
-
     /**
      *
-     * @var string $rotation Output rotation
+     * @var int $index Index of the output in alphabetical order
      */
-    private $rotation;
-
-    /**
-     *
-     * @var string $reflection Output reflection
-     */
-    private $reflection;
-
-    /**
-     *
-     * @var int $physicalWidth Output physical width
-     */
-    private $physicalWidth;
-
-    /**
-     *
-     * @var int $physicalHeight Output physical height
-     */
-    private $physicalHeight;
-
+    private $index;
     /**
      *
      * @var array $modes List of modes
      */
     private $modes;
+    /**
+     *
+     * @var string $name Name of the output
+     */
+    private $name;
+    /**
+     *
+     * @var int $physicalHeight Output physical height
+     */
+    private $physicalHeight;
+    /**
+     *
+     * @var int $physicalWidth Output physical width
+     */
+    private $physicalWidth;
+    /**
+     *
+     * @var boolean $primary Is primary
+     */
+    private $primary;
+    /**
+     *
+     * @var string $reflection Output reflection
+     */
+    private $reflection;
+    /**
+     *
+     * @var string $rotation Output rotation
+     */
+    private $rotation;
 
     /**
      * @param int      $index          Index of output
@@ -177,6 +167,24 @@ class Output
     }
 
     /**
+     * Add an existing Mode to the output (used by parser)
+     *
+     * @param Mode $mode
+     */
+    public function _addExistingMode($mode)
+    {
+        $this->modes[$mode->getName()] = $mode;
+    }
+
+    /**
+     * Clear all modes from the list
+     */
+    public function _clearExistingModes()
+    {
+        $this->modes = array();
+    }
+
+    /**
      * Get the output index
      *
      * @return int
@@ -184,6 +192,122 @@ class Output
     public function getIndex()
     {
         return $this->index;
+    }
+
+    /**
+     * Get all mode names
+     *
+     * @return array
+     */
+    public function getModeNames()
+    {
+        $modes = $this->getModes();
+
+        if ($modes == null) {
+            return null;
+        }
+
+        return array_keys($modes);
+    }
+
+    /**
+     * Get list of modes attached to the output
+     *
+     * @return array
+     */
+    public function getModes()
+    {
+        return $this->modes;
+    }
+
+    /**
+     * Get the output physical height
+     *
+     * @return int
+     */
+    public function getPhysicalHeight()
+    {
+        return $this->physicalHeight;
+    }
+
+    /**
+     * Get the output physical width
+     *
+     * @return int
+     */
+    public function getPhysicalWidth()
+    {
+        return $this->physicalWidth;
+    }
+
+    /**
+     * Get the preferred mode
+     *
+     * @return Mode
+     */
+    public function getPreferredMode()
+    {
+        $modes = $this->getModes();
+
+        if ($modes == null) {
+            return null;
+        }
+
+        $result = array_values(array_filter(
+            $modes, function ($e) {
+            return $e->isPreferred() == true;
+        }
+        ));
+
+        if (count($result) > 0) {
+            return $result[0];
+        }
+
+        return null;
+    }
+
+    /**
+     * Get the output reflection
+     *
+     * @return string
+     */
+    public function getReflection()
+    {
+        return $this->reflection;
+    }
+
+    /**
+     * Set the output reflection
+     *
+     * @param string $reflection Reflection to be set (use Reflection enum)
+     *
+     * @return boolean
+     */
+    public function setReflection($reflection)
+    {
+        return $this->_executeCommand("--reflect {$reflection}");
+    }
+
+    /**
+     * Get the output rotation
+     *
+     * @return string
+     */
+    public function getRotation()
+    {
+        return $this->rotation;
+    }
+
+    /**
+     * Set the output rotation
+     *
+     * @param string $rotation Rotation to be set (use Rotation enum)
+     *
+     * @return boolean
+     */
+    public function setRotation($rotation)
+    {
+        return $this->_executeCommand("--rotate {$rotation}");
     }
 
     /**
@@ -235,137 +359,31 @@ class Output
     }
 
     /**
-     * Get the output rotation
-     *
-     * @return string
-     */
-    public function getRotation()
-    {
-        return $this->rotation;
-    }
-
-    /**
-     * Set the output rotation
-     *
-     * @param string $rotation Rotation to be set (use Rotation enum)
+     * Reset scale-from to current mode's resolution
      *
      * @return boolean
      */
-    public function setRotation($rotation)
+    public function resetScaleFrom()
     {
-        return $this->_executeCommand("--rotate {$rotation}");
+        $nativeGeometry = $this->getCurrentMode()->getProbableGeometry();
+
+        if ($nativeGeometry == null) {
+            return false;
+        }
+
+        return $this->_executeCommand("--scale-from " . $nativeGeometry->getResolutionString());
     }
 
     /**
-     * Get the output reflection
+     * Set the output mode
      *
-     * @return string
-     */
-    public function getReflection()
-    {
-        return $this->reflection;
-    }
-
-    /**
-     * Set the output reflection
-     *
-     * @param string $reflection Reflection to be set (use Reflection enum)
+     * @param Mode $mode Mode to be switched to
      *
      * @return boolean
      */
-    public function setReflection($reflection)
+    public function setMode($mode)
     {
-        return $this->_executeCommand("--reflect {$reflection}");
-    }
-
-    /**
-     * Get the output physical width
-     *
-     * @return int
-     */
-    public function getPhysicalWidth()
-    {
-        return $this->physicalWidth;
-    }
-
-    /**
-     * Get the output physical height
-     *
-     * @return int
-     */
-    public function getPhysicalHeight()
-    {
-        return $this->physicalHeight;
-    }
-
-    /**
-     * Add an existing Mode to the output (used by parser)
-     *
-     * @param Mode $mode
-     */
-    public function _addExistingMode($mode)
-    {
-        $this->modes[$mode->getName()] = $mode;
-    }
-
-    /**
-     * Clear all modes from the list
-     */
-    public function _clearExistingModes()
-    {
-        $this->modes = array();
-    }
-
-    /**
-     * Get all mode names
-     *
-     * @return array
-     */
-    public function getModeNames()
-    {
-        $modes = $this->getModes();
-
-        if ($modes == null) {
-            return null;
-        }
-
-        return array_keys($modes);
-    }
-
-    /**
-     * Get list of modes attached to the output
-     *
-     * @return array
-     */
-    public function getModes()
-    {
-        return $this->modes;
-    }
-
-    /**
-     * Get the preferred mode
-     *
-     * @return Mode
-     */
-    public function getPreferredMode()
-    {
-        $modes = $this->getModes();
-
-        if ($modes == null) {
-            return null;
-        }
-
-        $result = array_values(array_filter(
-            $modes, function ($e) {
-            return $e->isPreferred() == true;
-        }
-        ));
-
-        if (count($result) > 0) {
-            return $result[0];
-        }
-
-        return null;
+        return $this->_executeCommand("--mode {$mode->getName()}");
     }
 
     /**
@@ -379,16 +397,6 @@ class Output
     }
 
     /**
-     * Set the output mode to 'preferred'
-     *
-     * @return boolean
-     */
-    public function setModePreferred()
-    {
-        return $this->_executeCommand("--preferred");
-    }
-
-    /**
      * Set the output mode to 'off'
      *
      * @return boolean
@@ -399,15 +407,13 @@ class Output
     }
 
     /**
-     * Set the output mode
-     *
-     * @param Mode $mode Mode to be switched to
+     * Set the output mode to 'preferred'
      *
      * @return boolean
      */
-    public function setMode($mode)
+    public function setModePreferred()
     {
-        return $this->_executeCommand("--mode {$mode->getName()}");
+        return $this->_executeCommand("--preferred");
     }
 
     /**
@@ -484,6 +490,16 @@ class Output
     }
 
     /**
+     * Get the output geometry
+     *
+     * @return Geometry
+     */
+    public function getGeometry()
+    {
+        return $this->geometry;
+    }
+
+    /**
      * Get the currently active mode
      *
      * @return Mode
@@ -510,29 +526,22 @@ class Output
     }
 
     /**
-     * Get the output geometry
+     * Set output transformation matrix
      *
-     * @return Geometry
-     */
-    public function getGeometry()
-    {
-        return $this->geometry;
-    }
-
-    /**
-     * Reset scale-from to current mode's resolution
+     * @param double $a
+     * @param double $b
+     * @param double $c
+     * @param double $d
+     * @param double $e
+     * @param double $f
+     * @param double $g
+     * @param double $h
+     * @param double $i
      *
-     * @return boolean
+     * @return bool
      */
-    public function resetScaleFrom()
+    public function setTransform($a, $b, $c, $d, $e, $f, $g, $h, $i)
     {
-        $nativeGeometry = $this->getCurrentMode()->getProbableGeometry();
-
-        if ($nativeGeometry == null) {
-            return false;
-        }
-
-        return $this->_executeCommand("--scale-from " . $nativeGeometry->getResolutionString());
+        return $this->_executeCommand("--transform {$a},{$b},{$c},{$d},{$e},{$f},{$g},{$h},{$i}");
     }
-
 }
