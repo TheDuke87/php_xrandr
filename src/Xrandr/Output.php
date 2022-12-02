@@ -430,6 +430,19 @@ class Output
     }
 
     /**
+     * Set output position by Geometry
+     *
+     * @param Geometry $geometry Geometry to be used for positioning
+     *
+     * @return boolean
+     */
+    public function setPositionByGeometry($geometry)
+    {
+        /** @var Geometry $geometry */
+        return $this->_executeCommand("--pos {$geometry->x}x{$geometry->y}");
+    }
+
+    /**
      * Get the output name
      *
      * @return string
