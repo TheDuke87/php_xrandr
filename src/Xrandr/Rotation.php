@@ -33,10 +33,8 @@ namespace Xrandr;
  */
 abstract class Rotation
 {
-
-    const NORMAL = "normal";
-    const LEFT = "left";
-    const RIGHT = "right";
-    const INVERTED = "inverted";
-
+    public const NORMAL = 'normal';
+    public const LEFT = 'left';
+    public const RIGHT = 'right';
+    public const INVERTED = 'inverted';
 }

@@ -42,26 +42,22 @@ class Mode
      *
      * @todo Regex is incomplete since I haven't found a documentation describing the complete line, yet
      */
-    const LINE_REGEX = '/^\s+(?P<name>\w+)\s+(?P<frequency>[\d.]+)(?P<current>[*\s]?)(?P<preferred>[+\s]?)/';
-
-    /**
-     *
-     * @var string $name Name of the mode
-     */
-    private $name;
-
-    /**
-     *
-     * @var string $frequency Frequency of the mode
-     */
-    private $frequency;
-
+    public const LINE_REGEX = '/^\s+(?P<name>\w+)\s+(?P<frequency>[\d.]+)(?P<current>[*\s]?)(?P<preferred>[+\s]?)/';
     /**
      *
      * @var boolean $current Is current mode
      */
     private $current;
-
+    /**
+     *
+     * @var string $frequency Frequency of the mode
+     */
+    private $frequency;
+    /**
+     *
+     * @var string $name Name of the mode
+     */
+    private $name;
     /**
      *
      * @var boolean $preferred Is preferred mode
@@ -88,15 +84,14 @@ class Mode
      *
      * @param string $line Line to be parsed
      *
-     * @return Mode
+     * @return self
      */
     public static function parseLine($line)
     {
-        trim($line);
-
-        if (preg_match(Mode::LINE_REGEX, $line, $result)) {
-            return new Mode($result["name"], $result["frequency"], ($result["current"] == "*") ? true : false,
-                ($result["preferred"] == "+") ? true : false);
+        if (preg_match(self::LINE_REGEX, $line, $result)) {
+            return new Mode($result['name'], $result['frequency'],
+                $result['current'] === '*',
+                $result['preferred'] === '+');
         }
 
         // ToDo: Exeption handling
@@ -105,16 +100,6 @@ class Mode
         }
 
         return null;
-    }
-
-    /**
-     * Get the name of the mode
-     *
-     * @return string
-     */
-    public function getName()
-    {
-        return $this->name;
     }
 
     /**
@@ -128,23 +113,13 @@ class Mode
     }
 
     /**
-     * Is the mode the currently active mode
+     * Get the name of the mode
      *
-     * @return boolean
+     * @return string
      */
-    public function isCurrent()
+    public function getName()
     {
-        return $this->current;
-    }
-
-    /**
-     * Is the mode the preferred mode
-     *
-     * @return boolean
-     */
-    public function isPreferred()
-    {
-        return $this->preferred;
+        return $this->name;
     }
 
     /**
@@ -155,5 +130,25 @@ class Mode
     public function getProbableResolution()
     {
         return Geometry::parseString($this->name);
+    }
+
+    /**
+     * Is the mode the currently active mode
+     *
+     * @return bool
+     */
+    public function isCurrent()
+    {
+        return $this->current;
+    }
+
+    /**
+     * Is the mode the preferred mode
+     *
+     * @return bool
+     */
+    public function isPreferred()
+    {
+        return $this->preferred;
     }
 }

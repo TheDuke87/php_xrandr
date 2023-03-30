@@ -33,27 +33,22 @@ namespace Xrandr;
  */
 class Geometry
 {
-
     /**
-     *
-     * @var int $width Width in pixels
-     */
-    public $width = 0;
-
-    /**
-     *
      * @var int $height Height in pixels
      */
     public $height = 0;
 
     /**
-     *
+     * @var int $width Width in pixels
+     */
+    public $width = 0;
+
+    /**
      * @var int $x X coordinate of position in pixels
      */
     public $x = 0;
 
     /**
-     *
      * @var int $y Y coordinate of position in pixels
      */
     public $y = 0;
@@ -66,11 +61,10 @@ class Geometry
      */
     public function __construct($width, $height, $x = 0, $y = 0)
     {
-
-        $this->width = $width;
-        $this->height = $height;
-        $this->x = $x;
-        $this->y = $y;
+        $this->width = (int)$width;
+        $this->height = (int)$height;
+        $this->x = (int)$x;
+        $this->y = (int)$y;
     }
 
     /**
@@ -90,20 +84,20 @@ class Geometry
 
         // Using switch just because I think its more "logical" selecting from a case
         switch (true) {
-            case ($string == ""):
+            case (empty($string)):
                 return null;
             // 1360x768+200+50
             // 1360x768-200-50
             case preg_match('/(?P<width>\d+)x(?P<height>\d+)(?P<x>[+\-]\d+)(?P<y>[+\-]\d+)/', $string, $result):
-                return new Geometry($result["width"], $result["height"], $result["x"], $result["y"]);
+                return new Geometry($result['width'], $result['height'], $result['x'], $result['y']);
             // 1360x768
             case preg_match('/(?P<width>\d+)x(?P<height>\d+)/', $string, $result):
-                return new Geometry($result["width"], $result["height"], 0, 0);
+                return new Geometry($result['width'], $result['height'], 0, 0);
             // +0+0
             // -0-0
             // 0+0
             case preg_match('/(?P<x>[+-]?\d+)(?P<y>[+-]\d+)/', $string, $result):
-                return new Geometry(0, 0, $result["x"], $result["y"]);
+                return new Geometry(0, 0, $result['x'], $result['y']);
             default:
                 // ToDo: Exeption handling
                 if (Xrandr::DEBUG) {
@@ -112,6 +106,54 @@ class Geometry
 
                 return null;
         }
+    }
+
+    /**
+     * Adds to the height of the geometry
+     *
+     * @param int $height
+     */
+    public function addHeight($height)
+    {
+        $this->height += (int)$height;
+
+        return $this;
+    }
+
+    /**
+     * Adds to the width of the geometry
+     *
+     * @param int $width
+     */
+    public function addWidth($width)
+    {
+        $this->width += (int)$width;
+
+        return $this;
+    }
+
+    /**
+     * Adds to the x coordinate of the geometry
+     *
+     * @param int $x
+     */
+    public function addX($x)
+    {
+        $this->x += (int)$x;
+
+        return $this;
+    }
+
+    /**
+     * Adds to the y coordinate of the geometry
+     *
+     * @param int $y
+     */
+    public function addY($y)
+    {
+        $this->y += (int)$y;
+
+        return $this;
     }
 
     /**
@@ -144,50 +186,9 @@ class Geometry
      */
     public function getPositionString()
     {
-        $signedX = sprintf("%+d", $this->x);
-        $signedY = sprintf("%+d", $this->y);
+        $signedX = sprintf('%+d', $this->x);
+        $signedY = sprintf('%+d', $this->y);
 
         return "{$signedX}{$signedY}";
     }
-
-    /**
-     * Adds to the width of the geometry
-     *
-     * @param int $width
-     */
-    public function addWidth($width)
-    {
-        $this->width += $width;
-    }
-
-    /**
-     * Adds to the height of the geometry
-     *
-     * @param int $height
-     */
-    public function addHeight($height)
-    {
-        $this->height += $height;
-    }
-
-    /**
-     * Adds to the x coordinate of the geometry
-     *
-     * @param int $x
-     */
-    public function addX($x)
-    {
-        $this->x += $x;
-    }
-
-    /**
-     * Adds to the y coordinate of the geometry
-     *
-     * @param int $y
-     */
-    public function addY($y)
-    {
-        $this->y += $y;
-    }
-
 }

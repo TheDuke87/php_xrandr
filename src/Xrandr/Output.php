@@ -33,7 +33,6 @@ namespace Xrandr;
  */
 class Output
 {
-
     /**
      * <name> <dis/connected> <primary> <resolution> <rotation> <reflection> (normal left inverted right x axis y axis)
      * <physicalWidth>mm x <physicalHeight>mm
@@ -50,52 +49,67 @@ class Output
      * @todo Regex is incomplete since some features are not needed, yet. Complete line is available above, extracted
      *       from xrandr.c
      */
-    const LINE_REGEX = '/^(?P<name>[\w-]+) (?P<connected>(dis)?connected)\s?(?P<primary>primary)?\s?(?P<geometry>[x+\-\d]+)?\s?(?P<rotation>(normal|left|right|inverted))?\s?(?P<reflection>X?\s?(and)?\s?Y? axis)?\s?(\(normal left inverted right x axis y axis\))?\s?((?P<physicalWidth>\d+)mm x (?P<physicalHeight>\d+)mm)?$/';
+    public const LINE_REGEX = '/^(?P<name>[\w-]+) (?P<connected>(dis)?connected)\s?(?P<primary>primary)?\s?(?P<geometry>[x+\-\d]+)?\s?(?P<rotation>(normal|left|right|inverted))?\s?(?P<reflection>X?\s?(and)?\s?Y? axis)?\s?(\(normal left inverted right x axis y axis\))?\s?((?P<physicalWidth>\d+)mm x (?P<physicalHeight>\d+)mm)?$/';
+
+    /**
+     * @var CommandLineBuilder $commandLineBuilder
+     */
+    private $commandLineBuilder;
+
     /**
      *
      * @var boolean $connected Is connected
      */
     private $connected;
+
     /**
      *
      * @var Geometry $geometry Output geometry
      */
     private $geometry;
+
     /**
      *
      * @var int $index Index of the output in alphabetical order
      */
     private $index;
+
     /**
      *
      * @var array $modes List of modes
      */
     private $modes;
+
     /**
      *
      * @var string $name Name of the output
      */
     private $name;
+
     /**
      *
      * @var int $physicalHeight Output physical height
      */
     private $physicalHeight;
+
     /**
      *
      * @var int $physicalWidth Output physical width
      */
     private $physicalWidth;
+
     /**
      *
      * @var boolean $primary Is primary
      */
     private $primary;
+
     /**
      *
      * @var string $reflection Output reflection
      */
     private $reflection;
+
     /**
      *
      * @var string $rotation Output rotation
@@ -119,10 +133,11 @@ class Output
         $connected,
         $primary = false,
         $geometry = null,
-        $rotation = "",
-        $reflection = "",
+        $rotation = '',
+        $reflection = '',
         $physicalWidth = 0,
-        $physicalHeight = 0
+        $physicalHeight = 0,
+        $commandLineBuilder = null
     ) {
         $this->index = $index;
         $this->name = $name;
@@ -133,6 +148,7 @@ class Output
         $this->reflection = $reflection;
         $this->physicalWidth = $physicalWidth;
         $this->physicalHeight = $physicalHeight;
+        $this->commandLineBuilder = $commandLineBuilder;
     }
 
     /**
@@ -144,18 +160,17 @@ class Output
      * @return Output
      * @todo Exception handling
      */
-    public static function parseLine($index, $line)
+    public static function parseLine($index, $line, $commandLineBuilder = null)
     {
-        trim($line);
-
-        if (preg_match(Output::LINE_REGEX, $line, $result)) {
-            return new Output($index, $result["name"], ($result["connected"] == "connected") ? true : false,
-                (isset($result["primary"]) && $result["primary"] == "primary") ? true : false,
-                isset($result["geometry"]) ? Geometry::parseString($result["geometry"]) : null,
-                (isset($result["rotation"]) && $result["rotation"] != "") ? $result["rotation"] : Rotation::NORMAL,
-                isset($result["reflection"]) ? Reflection::parseString($result["reflection"]) : Reflection::NORMAL,
-                isset($result["physicalWidth"]) ? $result["physicalWidth"] : 0,
-                isset($result["physicalHeight"]) ? $result["physicalHeight"] : 0);
+        if (preg_match(self::LINE_REGEX, $line, $result)) {
+            return new Output($index, $result['name'], $result['connected'] === 'connected',
+                isset($result['primary']) && $result['primary'] === 'primary',
+                isset($result['geometry']) ? Geometry::parseString($result['geometry']) : null,
+                !empty($result['rotation']) ? $result['rotation'] : Rotation::NORMAL,
+                !empty($result['reflection']) ? Reflection::parseString($result['reflection']) : Reflection::NORMAL,
+                isset($result['physicalWidth']) ? $result['physicalWidth'] : 0,
+                isset($result['physicalHeight']) ? $result['physicalHeight'] : 0,
+                $commandLineBuilder);
         }
 
         // ToDo: Exeption handling
@@ -171,15 +186,25 @@ class Output
      *
      * @param Mode $mode
      */
-    public function _addExistingMode($mode)
+    public function addExistingMode($mode)
     {
         $this->modes[$mode->getName()] = $mode;
     }
 
     /**
+     * Get the output name
+     *
+     * @return string
+     */
+    public function getName()
+    {
+        return $this->name;
+    }
+
+    /**
      * Clear all modes from the list
      */
-    public function _clearExistingModes()
+    public function clearExistingModes()
     {
         $this->modes = array();
     }
@@ -197,13 +222,13 @@ class Output
     /**
      * Get all mode names
      *
-     * @return array
+     * @return string[]
      */
     public function getModeNames()
     {
         $modes = $this->getModes();
 
-        if ($modes == null) {
+        if ($modes === null) {
             return null;
         }
 
@@ -213,7 +238,7 @@ class Output
     /**
      * Get list of modes attached to the output
      *
-     * @return array
+     * @return Mode[]
      */
     public function getModes()
     {
@@ -249,13 +274,13 @@ class Output
     {
         $modes = $this->getModes();
 
-        if ($modes == null) {
+        if ($modes === null) {
             return null;
         }
 
         $result = array_values(array_filter(
-            $modes, function ($e) {
-            return $e->isPreferred() == true;
+            $modes, static function ($e) {
+            return $e->isPreferred();
         }
         ));
 
@@ -281,11 +306,31 @@ class Output
      *
      * @param string $reflection Reflection to be set (use Reflection enum)
      *
-     * @return boolean
+     * @return bool
      */
     public function setReflection($reflection)
     {
-        return $this->_executeCommand("--reflect {$reflection}");
+        return $this->executeCommand("--reflect {$reflection}");
+    }
+
+    /**
+     * Executes a command on the outputor adds it to the command line builder
+     *
+     * @param string $command Command to be executed
+     *
+     * @return bool
+     */
+    private function executeCommand($command)
+    {
+        $command = "--output {$this->name} {$command}";
+
+        if ($this->commandLineBuilder) {
+            $this->commandLineBuilder->addCommand($command);
+
+            return true;
+        }
+
+        return Xrandr::executeCommand($command);
     }
 
     /**
@@ -303,17 +348,17 @@ class Output
      *
      * @param string $rotation Rotation to be set (use Rotation enum)
      *
-     * @return boolean
+     * @return bool
      */
     public function setRotation($rotation)
     {
-        return $this->_executeCommand("--rotate {$rotation}");
+        return $this->executeCommand("--rotate {$rotation}");
     }
 
     /**
      * Is the output currently connected
      *
-     * @return boolean
+     * @return bool
      */
     public function isConnected()
     {
@@ -323,7 +368,7 @@ class Output
     /**
      * Is the output the primary output
      *
-     * @return boolean
+     * @return bool
      */
     public function isPrimary()
     {
@@ -333,183 +378,27 @@ class Output
     /**
      * Set this output as primary
      *
-     * @return boolean
+     * @return bool
      */
     public function setPrimary()
     {
-        return $this->_executeCommand("--primary");
-    }
-
-    /**
-     * Executes a command on the output
-     *
-     * @param string $command Command to be executed
-     *
-     * @return boolean
-     */
-    private function _executeCommand($command)
-    {
-        exec(Xrandr::XRANDR_BIN . " --output {$this->name} {$command}", $output, $exitcode);
-
-        if ($exitcode != 0) {
-            return false;
-        }
-
-        return true;
+        return $this->executeCommand('--primary');
     }
 
     /**
      * Reset scale-from to current mode's resolution
      *
-     * @return boolean
+     * @return bool
      */
     public function resetScaleFrom()
     {
-        $nativeGeometry = $this->getCurrentMode()->getProbableGeometry();
+        $nativeGeometry = $this->getCurrentMode()->getProbableResolution();
 
-        if ($nativeGeometry == null) {
+        if ($nativeGeometry === null) {
             return false;
         }
 
-        return $this->_executeCommand("--scale-from " . $nativeGeometry->getResolutionString());
-    }
-
-    /**
-     * Set the output mode
-     *
-     * @param Mode $mode Mode to be switched to
-     *
-     * @return boolean
-     */
-    public function setMode($mode)
-    {
-        return $this->_executeCommand("--mode {$mode->getName()}");
-    }
-
-    /**
-     * Set the output mode to 'auto'
-     *
-     * @return boolean
-     */
-    public function setModeAuto()
-    {
-        return $this->_executeCommand("--auto");
-    }
-
-    /**
-     * Set the output mode to 'off'
-     *
-     * @return boolean
-     */
-    public function setModeOff()
-    {
-        return $this->_executeCommand("--off");
-    }
-
-    /**
-     * Set the output mode to 'preferred'
-     *
-     * @return boolean
-     */
-    public function setModePreferred()
-    {
-        return $this->_executeCommand("--preferred");
-    }
-
-    /**
-     * Set output position relative to another output
-     *
-     * @param string $position    Position to be set (use Position enum)
-     * @param Output $otherOutput Other output to position relative to
-     *
-     * @return boolean
-     */
-    public function setPosition($position, $otherOutput)
-    {
-        return $this->_executeCommand("--{$position} {$otherOutput->getName()}");
-    }
-
-    /**
-     * Set output position by Geometry
-     *
-     * @param Geometry $geometry Geometry to be used for positioning
-     *
-     * @return boolean
-     */
-    public function setPositionByGeometry($geometry)
-    {
-        /** @var Geometry $geometry */
-        return $this->_executeCommand("--pos {$geometry->x}x{$geometry->y}");
-    }
-
-    /**
-     * Get the output name
-     *
-     * @return string
-     */
-    public function getName()
-    {
-        return $this->name;
-    }
-
-    /**
-     * Set output scale
-     *
-     * @param Geometry $resolution Resolution to be scaled to
-     *
-     * @return boolean
-     */
-    public function setScale($resolution)
-    {
-        return $this->_executeCommand("--scale " . $resolution->getResolutionString());
-    }
-
-    /**
-     * Set output scale-from
-     *
-     * @param Geometry $resolution Resolution to be scaled to
-     *
-     * @return boolean
-     */
-    public function setScaleFrom($resolution)
-    {
-        return $this->_executeCommand("--scale-from " . $resolution->getResolutionString());
-    }
-
-    /**
-     * Set output scale-from output
-     *
-     * @param Output $output Active output the resolution is to be scaled to
-     *
-     * @return boolean
-     */
-    public function setScaleFromOutput($output)
-    {
-        if (!$output->isActive()) {
-            return false;
-        }
-
-        return $this->_executeCommand("--scale-from " . $output->getGeometry()->getResolutionString());
-    }
-
-    /**
-     * Is the output active
-     *
-     * @return boolean
-     */
-    public function isActive()
-    {
-        return ($this->getCurrentMode() != null);
-    }
-
-    /**
-     * Get the output geometry
-     *
-     * @return Geometry
-     */
-    public function getGeometry()
-    {
-        return $this->geometry;
+        return $this->executeCommand('--scale-from ' . $nativeGeometry->getResolutionString());
     }
 
     /**
@@ -521,13 +410,13 @@ class Output
     {
         $modes = $this->getModes();
 
-        if ($modes == null) {
+        if ($modes === null) {
             return null;
         }
 
         $result = array_values(array_filter(
-            $modes, function ($e) {
-            return $e->isCurrent() == true;
+            $modes, static function ($e) {
+            return $e->isCurrent();
         }
         ));
 
@@ -536,6 +425,134 @@ class Output
         }
 
         return null;
+    }
+
+    /**
+     * Set the output mode
+     *
+     * @param Mode $mode Mode to be switched to
+     *
+     * @return bool
+     */
+    public function setMode($mode)
+    {
+        return $this->executeCommand("--mode {$mode->getName()}");
+    }
+
+    /**
+     * Set the output mode to 'auto'
+     *
+     * @return bool
+     */
+    public function setModeAuto()
+    {
+        return $this->executeCommand('--auto');
+    }
+
+    /**
+     * Set the output mode to 'off'
+     *
+     * @return bool
+     */
+    public function setModeOff()
+    {
+        return $this->executeCommand('--off');
+    }
+
+    /**
+     * Set the output mode to 'preferred'
+     *
+     * @return bool
+     */
+    public function setModePreferred()
+    {
+        return $this->executeCommand('--preferred');
+    }
+
+    /**
+     * Set output position relative to another output
+     *
+     * @param string $position    Position to be set (use Position enum)
+     * @param Output $otherOutput Other output to position relative to
+     *
+     * @return bool
+     */
+    public function setPosition($position, $otherOutput)
+    {
+        return $this->executeCommand("--{$position} {$otherOutput->getName()}");
+    }
+
+    /**
+     * Set output position by Geometry
+     *
+     * @param Geometry $geometry Geometry to be used for positioning
+     *
+     * @return bool
+     */
+    public function setPositionByGeometry($geometry)
+    {
+        /** @var Geometry $geometry */
+        return $this->executeCommand("--pos {$geometry->x}x{$geometry->y}");
+    }
+
+    /**
+     * Set output scale
+     *
+     * @param Geometry $resolution Resolution to be scaled to
+     *
+     * @return bool
+     */
+    public function setScale($resolution)
+    {
+        return $this->executeCommand('--scale ' . $resolution->getResolutionString());
+    }
+
+    /**
+     * Set output scale-from
+     *
+     * @param Geometry $resolution Resolution to be scaled to
+     *
+     * @return bool
+     */
+    public function setScaleFrom($resolution)
+    {
+        return $this->executeCommand('--scale-from ' . $resolution->getResolutionString());
+    }
+
+    /**
+     * Set output scale-from output
+     *
+     * @param Output $output Active output the resolution is to be scaled to
+     *
+     * @return bool
+     */
+    public function setScaleFromOutput($output)
+    {
+        if (!$output->isActive()) {
+            return false;
+        }
+
+        return $this->executeCommand('--scale-from ' . $output->getGeometry()->getResolutionString());
+    }
+
+    /**
+     * Is the output active
+     *
+     * @return bool
+     */
+    public function isActive()
+    {
+        return $this->getCurrentMode() !== null;
+    }
+
+    /**
+     * Get the output geometry
+     *
+     * @return Geometry
+     */
+    public function getGeometry()
+    {
+        return $this->geometry;
     }
 
     /**
@@ -555,6 +572,6 @@ class Output
      */
     public function setTransform($a, $b, $c, $d, $e, $f, $g, $h, $i)
     {
-        return $this->_executeCommand("--transform {$a},{$b},{$c},{$d},{$e},{$f},{$g},{$h},{$i}");
+        return $this->executeCommand("--transform {$a},{$b},{$c},{$d},{$e},{$f},{$g},{$h},{$i}");
     }
 }

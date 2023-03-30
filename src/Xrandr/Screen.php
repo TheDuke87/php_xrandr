@@ -33,37 +33,31 @@ namespace Xrandr;
  */
 class Screen
 {
-
     /**
      * Screen <id>: minimum <minimumGeometry>, current <currentGeometry>, maximum <maximumGeometry>
      * Screen 0: minimum 8 x 8, current 1360 x 768, maximum 32767 x 32767
      *
      * Named Subpatterns: http://php.net/manual/en/function.preg-match.php Example #4
      */
-    const LINE_REGEX = '/^Screen (?P<id>\d+): minimum (?P<minimumGeometry>\d+\s?x\s?\d+), current (?P<currentGeometry>\d+\s?x\s?\d+), maximum (?P<maximumGeometry>\d+\s?x\s?\d+)$/';
-
+    public const LINE_REGEX = '/^Screen (?P<id>\d+): minimum (?P<minimumGeometry>\d+\s?x\s?\d+), current (?P<currentGeometry>\d+\s?x\s?\d+), maximum (?P<maximumGeometry>\d+\s?x\s?\d+)$/';
+    /**
+     * @var Geometry $currentGeometry Current geometry of the screen
+     */
+    private $currentGeometry;
     /**
      * @var int $id Id of the screen
      */
     private $id;
-
+    /**
+     * @var Geometry $maximumGeometry Maximum geometry of the screen
+     */
+    private $maximumGeometry;
     /**
      * @var Geometry $minimumGeometry Minimum geometry of the screen
      */
     private $minimumGeometry;
 
     /**
-     * @var Geometry $currentGeometry Current geometry of the screen
-     */
-    private $currentGeometry;
-
-    /**
-     * @var Geometry $maximumGeometry Maximum geometry of the screen
-     */
-    private $maximumGeometry;
-
-    /**
-     *
      * @param int      $id              Id of the screen
      * @param Geometry $minimumGeometry Minimum geometry of the screen
      * @param Geometry $currentGeometry Current geometry of the screen
@@ -86,11 +80,12 @@ class Screen
      */
     public static function parseLine($line)
     {
-        trim($line);
-
-        if (preg_match(Screen::LINE_REGEX, $line, $result)) {
-            return new Screen($result["id"], Geometry::parseString($result["minimumGeometry"]),
-                Geometry::parseString($result["currentGeometry"]), Geometry::parseString($result["maximumGeometry"]));
+        if (preg_match(self::LINE_REGEX, $line, $result)) {
+            return new Screen($result['id'],
+                Geometry::parseString($result['minimumGeometry']),
+                Geometry::parseString($result['currentGeometry']),
+                Geometry::parseString($result['maximumGeometry'])
+            );
         }
 
         // ToDo: Exeption handling
@@ -99,26 +94,6 @@ class Screen
         }
 
         return null;
-    }
-
-    /**
-     * Get the id of the screen
-     *
-     * @return int
-     */
-    public function getId()
-    {
-        return $this->id;
-    }
-
-    /**
-     * Get the minimum geometry of the screen
-     *
-     * @return Geometry
-     */
-    public function getMinimumGeometry()
-    {
-        return $this->minimumGeometry;
     }
 
     /**
@@ -132,6 +107,16 @@ class Screen
     }
 
     /**
+     * Get the id of the screen
+     *
+     * @return int
+     */
+    public function getId()
+    {
+        return $this->id;
+    }
+
+    /**
      * Get the maximum geometry of the screen
      *
      * @return Geometry
@@ -141,4 +126,13 @@ class Screen
         return $this->maximumGeometry;
     }
 
+    /**
+     * Get the minimum geometry of the screen
+     *
+     * @return Geometry
+     */
+    public function getMinimumGeometry()
+    {
+        return $this->minimumGeometry;
+    }
 }

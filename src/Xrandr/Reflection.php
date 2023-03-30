@@ -33,11 +33,10 @@ namespace Xrandr;
  */
 abstract class Reflection
 {
-
-    const NORMAL = "normal";
-    const X = "x";
-    const Y = "y";
-    const XY = "xy";
+    public const NORMAL = 'normal';
+    public const X = 'x';
+    public const Y = 'y';
+    public const XY = 'xy';
 
     /**
      * Parse a string containing the current reflection of an output
@@ -53,17 +52,17 @@ abstract class Reflection
     {
         // Using switch just because I think its more "logical" selecting from a case
         switch (true) {
-            case ($string == ""):
+            case (empty($string)):
                 return null;
             // X and Y axis
             case preg_match('/X and Y axis/', $string, $result):
-                return Reflection::XY;
+                return self::XY;
             // X axis
             case preg_match('/X axis/', $string, $result):
-                return Reflection::X;
+                return self::X;
             // Y axis
             case preg_match('/Y axis/', $string, $result):
-                return Reflection::Y;
+                return self::Y;
             default:
                 // ToDo: Exeption handling
                 if (Xrandr::DEBUG) {
@@ -73,5 +72,4 @@ abstract class Reflection
                 return null;
         }
     }
-
 }
