@@ -130,7 +130,7 @@ class Xrandr
      */
     private function refreshRaw()
     {
-        exec(self::TIMEOUT_BIN . ' --signal=KILL 10s ' . self::XRANDR_BIN . ' --query 2>/dev/null', $output,
+        exec(self::TIMEOUT_BIN . ' --signal=KILL 10s ' . self::XRANDR_BIN . ' --query --current 2>/dev/null', $output,
             $exitcode);
 
         if ($exitcode !== 0) {
