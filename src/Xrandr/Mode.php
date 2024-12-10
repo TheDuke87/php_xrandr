@@ -42,7 +42,7 @@ class Mode
      *
      * @todo Regex is incomplete since I haven't found a documentation describing the complete line, yet
      */
-    public const LINE_REGEX = '/^\s+(?P<name>\w+)\s+(?P<frequency>[\d.]+)(?P<current>[*\s]?)(?P<preferred>[+\s]?)/';
+    public const LINE_REGEX = '/^\s+(?P<name>[\w\.]+)\s+(?P<frequency>[\d.]+)(?P<current>[*\s]?)(?P<preferred>[+\s]?)/';
     /**
      *
      * @var boolean $current Is current mode
